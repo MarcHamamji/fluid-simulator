@@ -5,6 +5,10 @@ typedef struct {
   float y;
 } Vector;
 
+#define VECTOR_ZERO (Vector) {0, 0}
+
+Vector vector_new(float x, float y);
+
 double vector_norm_squared(Vector a);
 
 double vector_norm(Vector a);
@@ -17,9 +21,12 @@ Vector vector_add(Vector a, Vector b);
 
 Vector vector_subtract(Vector a, Vector b);
 
-Vector vector_multiply(Vector a, double b);
+Vector vector_scale(Vector a, double b);
 
 Vector vector_normalize(Vector a);
 
 double vector_dot(Vector a, Vector b);
 
+Vector vector_random();
+
+Vector vector_random_in_rect(Vector bounds);

@@ -6,4 +6,4 @@ typedef struct {
   double blue;
 } Color;
 
-Color color_new_from_hsl(double h, double s, double l);
+Color color_new_from_hsv(double h, double s, double v);
