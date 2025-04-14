@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdbool.h>
 typedef struct {
   float x;
   float y;
@@ -29,4 +30,12 @@ double vector_dot(Vector a, Vector b);
 
 Vector vector_random();
 
-Vector vector_random_in_rect(Vector bounds);
+Vector vector_random_in_rect(Vector rect);
+
+Vector vector_divide(Vector a, Vector b);
+
+Vector vector_floor(Vector a);
+
+Vector vector_ceil(Vector a);
+
+bool vector_is_in_rect(Vector a, Vector rect);

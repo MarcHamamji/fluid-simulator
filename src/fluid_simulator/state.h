@@ -1,14 +1,15 @@
 #pragma once
 
-#include <gtk/gtk.h>
-
+#include "../utils/vector.h"
+#include "space_partitioning_grid.h"
 #include "particle.h"
 
 typedef struct State {
   Vector window_size; 
 
   unsigned int particles_number;
-  Particle* particles;
+  Particle** particles;
+  SpacePartitioningGrid space_partitioning_grid;
 
   float collision_damping;
   float smoothing_radius;

@@ -14,9 +14,7 @@ typedef struct {
   State *state;
 } Particle;
 
-#include "state.h"
-
-Particle particle_generate(State *state, unsigned int radius,
+Particle* particle_generate(State *state, unsigned int radius,
                            float velocity_norm, Vector acceleration);
 
 void particle_draw(Particle *particle, cairo_t *cr);

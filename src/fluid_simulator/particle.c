@@ -4,18 +4,23 @@
 #include "../utils/color.h"
 #include "../utils/vector.h"
 #include "particle.h"
+#include "space_partitioning_grid.h"
+#include "state.h"
 
-Particle particle_generate(State *state, unsigned int radius,
-                           float velocity_norm, Vector acceleration) {
+Particle *particle_generate(State *state, unsigned int radius,
+                            float velocity_norm, Vector acceleration) {
   Vector velocity = vector_scale(vector_random(), velocity_norm);
 
-  return (Particle){
+  Particle *particle = malloc(sizeof(Particle));
+  *particle = (Particle){
       .radius = radius,
       .position = vector_random_in_rect(state->window_size),
       .velocity = velocity,
       .acceleration = acceleration,
       .state = state,
   };
+
+  return particle;
 }
 
 void particle_draw(Particle *particle, cairo_t *cr) {
@@ -26,8 +31,10 @@ void particle_draw(Particle *particle, cairo_t *cr) {
   //             (hue_when_velocity_0 / velocity_when_hue_0) * velocity_norm;
   // Color color = color_new_from_hsv(hue, 1, 0.6);
 
-  float hue = particle_get_density(particle) * 50000;
-  Color color = color_new_from_hsv(hue, 1, 0.6);
+  float hue = 220 - particle_get_density(particle) * 20000;
+  Color color = color_new_from_hsv(hue < 0 ? 0 : hue, 1, 0.6);
+
+  // Color color = color_new_from_hsv(120, 1, 0.5);
 
   cairo_set_source_rgb(cr, color.red, color.green, color.blue);
   cairo_arc(cr, particle->position.x, particle->position.y, particle->radius, 0,
@@ -51,10 +58,12 @@ void particle_handle_wall_collisions(Particle *particle) {
 
   if (particle->position.x < min_x) {
     particle->position.x = min_x;
-    particle->velocity.x = -particle->velocity.x * particle->state->collision_damping;
+    particle->velocity.x =
+        -particle->velocity.x * particle->state->collision_damping;
   } else if (particle->position.x > max_x) {
     particle->position.x = max_x;
-    particle->velocity.x = -particle->velocity.x * particle->state->collision_damping;
+    particle->velocity.x =
+        -particle->velocity.x * particle->state->collision_damping;
   }
 
   double min_y = particle->radius;
@@ -62,26 +71,32 @@ void particle_handle_wall_collisions(Particle *particle) {
 
   if (particle->position.y < min_y) {
     particle->position.y = min_y;
-    particle->velocity.y = -particle->velocity.y * particle->state->collision_damping;
+    particle->velocity.y =
+        -particle->velocity.y * particle->state->collision_damping;
   } else if (particle->position.y > max_y) {
     particle->position.y = max_y;
-    particle->velocity.y = -particle->velocity.y * particle->state->collision_damping;
+    particle->velocity.y =
+        -particle->velocity.y * particle->state->collision_damping;
   }
 }
 
+static float density_function(Particle *particle, Particle *neighbor) {
+  State *state = particle->state;
+
+  float distance_squared = vector_distance_squared(particle->position, neighbor->position);
+  if (distance_squared >= powf(state->smoothing_radius, 2))
+    return 0;
+
+  float distance = sqrtf(distance_squared);
+  float volume = (G_PI * powf(state->smoothing_radius, 5)) / 10;
+  float influence = powf(state->smoothing_radius - distance, 3) / volume;
+
+  return influence;
+}
+
 float particle_get_density(Particle *particle) {
-    float density = 0;
-    State *state = particle->state;
+  float newdensity = space_partitioning_grid_accumulate_over_neighbors(
+      &particle->state->space_partitioning_grid, particle, density_function);
 
-    for (int i = 0; i < state->particles_number; i++) {
-        Particle other = state->particles[i];
-        float distance = vector_distance(particle->position, other.position);
-        if (distance >= state->smoothing_radius) continue;
-
-        float volume = (G_PI * pow(state->smoothing_radius, 5)) / 10;
-        float influence = pow(state->smoothing_radius - distance, 3) / volume;
-        density += influence;
-    }
-
-    return density;
+  return newdensity;
 }
