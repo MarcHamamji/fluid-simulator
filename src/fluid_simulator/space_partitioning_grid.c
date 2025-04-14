@@ -6,7 +6,8 @@
 SpacePartitioningGrid space_partitioning_grid_new(Vector cell_size,
                                                   Vector window_size) {
 
-  Vector grid_size = vector_ceil(vector_divide(window_size, cell_size));
+  Vector grid_size_not_ceiled = vector_divide(&window_size, &cell_size);
+  Vector grid_size = vector_ceil(&grid_size_not_ceiled);
   int grid_length = grid_size.x * grid_size.y;
 
   SpacePartitioningGrid grid = (SpacePartitioningGrid){
@@ -28,8 +29,12 @@ SpacePartitioningGrid space_partitioning_grid_new(Vector cell_size,
 static Vector
 space_partitioning_grid_get_cell_coordinates(SpacePartitioningGrid *grid,
                                              Particle *particle) {
-  Vector cell_coordinates =
-      vector_floor(vector_divide(particle->position, grid->cell_size));
+
+  Vector cell_coordinates_not_floored =
+      vector_divide(&particle->position, &grid->cell_size);
+
+  Vector cell_coordinates = vector_floor(&cell_coordinates_not_floored);
+
   return cell_coordinates;
 }
 
@@ -60,10 +65,10 @@ float space_partitioning_grid_accumulate_over_neighbors(
 
   for (int i = -1; i <= 1; i++) {
     for (int j = -1; j <= 1; j++) {
-      Vector neighbor_cell_coordinate =
-          vector_add(cell_coordinates, vector_new(i, j));
+      Vector offset = vector_new(i, j);
+      Vector neighbor_cell_coordinate = vector_add(&cell_coordinates, &offset);
 
-      if (!vector_is_in_rect(neighbor_cell_coordinate, grid->grid_size))
+      if (!vector_is_in_rect(&neighbor_cell_coordinate, &grid->grid_size))
         continue;
 
       int index =

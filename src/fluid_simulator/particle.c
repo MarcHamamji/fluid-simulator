@@ -9,12 +9,14 @@
 
 Particle *particle_generate(State *state, unsigned int radius,
                             float velocity_norm, Vector acceleration) {
-  Vector velocity = vector_scale(vector_random(), velocity_norm);
+
+  Vector random_direction = vector_random();
+  Vector velocity = vector_scale(&random_direction, velocity_norm);
 
   Particle *particle = malloc(sizeof(Particle));
   *particle = (Particle){
       .radius = radius,
-      .position = vector_random_in_rect(state->window_size),
+      .position = vector_random_in_rect(&state->window_size),
       .velocity = velocity,
       .acceleration = acceleration,
       .state = state,
@@ -83,7 +85,8 @@ void particle_handle_wall_collisions(Particle *particle) {
 static float density_function(Particle *particle, Particle *neighbor) {
   State *state = particle->state;
 
-  float distance_squared = vector_distance_squared(particle->position, neighbor->position);
+  float distance_squared =
+      vector_distance_squared(&particle->position, &neighbor->position);
   if (distance_squared >= powf(state->smoothing_radius, 2))
     return 0;
 
