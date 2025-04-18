@@ -26,17 +26,8 @@ Particle *particle_generate(State *state, unsigned int radius,
 }
 
 void particle_draw(Particle *particle, cairo_t *cr) {
-  // float velocity_norm = vector_norm(particle->velocity);
-  // float hue_when_velocity_0 = 120;
-  // float velocity_when_hue_0 = 15;
-  // float hue = hue_when_velocity_0 -
-  //             (hue_when_velocity_0 / velocity_when_hue_0) * velocity_norm;
-  // Color color = color_new_from_hsv(hue, 1, 0.6);
-
   float hue = 220 - particle_get_density(particle) * 20000;
   Color color = color_new_from_hsv(hue < 0 ? 0 : hue, 1, 0.6);
-
-  // Color color = color_new_from_hsv(120, 1, 0.5);
 
   cairo_set_source_rgb(cr, color.red, color.green, color.blue);
   cairo_arc(cr, particle->position.x, particle->position.y, particle->radius, 0,
