@@ -19,12 +19,11 @@ static bool trigger_draw(GtkDrawingArea *drawing_area) {
 
 static void draw(GtkDrawingArea *drawing_area, cairo_t *cr, int width,
                  int height, gpointer _data) {
-
-  double delta_time = timer_get_seconds(&timer);
-
-  timer_start(&timer);
-  fluid_simulator_draw(drawing_area, cr, width, height, delta_time, state);
   timer_stop(&timer);
+  double delta_time = timer_get_seconds(&timer);
+  timer_start(&timer);
+
+  fluid_simulator_draw(drawing_area, cr, width, height, delta_time, state);
 
   char str[32];
   sprintf(str, "FPS: %f", (1 / delta_time));
@@ -48,6 +47,7 @@ int main(int argc, char *argv[]) {
   window = window_new("Fluid Simulator", state->window_size.x,
                       state->window_size.y, draw);
 
+  timer_start(&timer);
   int status = window_present(window);
 
   state_free(state);
