@@ -11,11 +11,12 @@ typedef struct {
   Vector velocity;
   Vector acceleration;
   unsigned int radius;
+  float density;
   State *state;
 } Particle;
 
-Particle* particle_generate(State *state, unsigned int radius,
-                           float velocity_norm, Vector acceleration);
+Particle *particle_generate(State *state, unsigned int radius,
+                            float velocity_norm, Vector acceleration);
 
 void particle_draw(Particle *particle, cairo_t *cr);
 
@@ -25,4 +26,6 @@ void particle_update_position(Particle *particle, double dt);
 
 void particle_handle_wall_collisions(Particle *particle);
 
-float particle_get_density(Particle *particle);
+void particle_update_density(Particle *particle);
+
+Vector particle_get_gradient(Particle *particle);

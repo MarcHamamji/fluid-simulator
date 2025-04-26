@@ -11,6 +11,7 @@ typedef struct State {
   Particle** particles;
   SpacePartitioningGrid space_partitioning_grid;
 
+  float particle_radius;
   float collision_damping;
   float smoothing_radius;
 } State;

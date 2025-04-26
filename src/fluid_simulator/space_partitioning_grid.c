@@ -28,10 +28,10 @@ SpacePartitioningGrid space_partitioning_grid_new(Vector cell_size,
 
 static Vector
 space_partitioning_grid_get_cell_coordinates(SpacePartitioningGrid *grid,
-                                             Particle *particle) {
+                                             Vector *position) {
 
   Vector cell_coordinates_not_floored =
-      vector_divide(&particle->position, &grid->cell_size);
+      vector_divide(position, &grid->cell_size);
 
   Vector cell_coordinates = vector_floor(&cell_coordinates_not_floored);
 
@@ -47,7 +47,7 @@ static int space_partitioning_grid_get_index(SpacePartitioningGrid *grid,
 void space_partitioning_grid_add_particle(SpacePartitioningGrid *grid,
                                           Particle *particle) {
   Vector cell_coordinates =
-      space_partitioning_grid_get_cell_coordinates(grid, particle);
+      space_partitioning_grid_get_cell_coordinates(grid, &particle->position);
 
   int index = space_partitioning_grid_get_index(grid, cell_coordinates);
 
@@ -55,11 +55,11 @@ void space_partitioning_grid_add_particle(SpacePartitioningGrid *grid,
 }
 
 float space_partitioning_grid_accumulate_over_neighbors(
-    SpacePartitioningGrid *grid, Particle *particle,
-    float (*callback)(Particle *particle, Particle *neighbor)) {
+    SpacePartitioningGrid *grid, Vector *source, State* state,
+    float (*callback)(Vector *source, Particle *neighbor, State *state)) {
 
   Vector cell_coordinates =
-      space_partitioning_grid_get_cell_coordinates(grid, particle);
+      space_partitioning_grid_get_cell_coordinates(grid, source);
 
   float accumulator = 0;
 
@@ -78,7 +78,7 @@ float space_partitioning_grid_accumulate_over_neighbors(
       ParticleLinkedListNode *current = particle_linked_list->head;
 
       while (current != NULL) {
-        accumulator += callback(particle, current->particle);
+        accumulator += callback(source, current->particle, state);
         current = current->next;
       }
     }

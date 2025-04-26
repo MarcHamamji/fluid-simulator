@@ -21,8 +21,8 @@ void space_partitioning_grid_add_particle(SpacePartitioningGrid *grid,
                                           Particle *particle);
 
 float space_partitioning_grid_accumulate_over_neighbors(
-    SpacePartitioningGrid *grid, Particle *particle,
-    float (*callback)(Particle *particle, Particle* neighbor));
+    SpacePartitioningGrid *grid, Vector *source, State* state,
+    float (*callback)(Vector *source, Particle *neighbor, State *state));
 
 void space_partitioning_grid_clear_cells(SpacePartitioningGrid *grid);
 
